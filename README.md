@@ -1,73 +1,108 @@
 # LabVerse AI
 
-LabVerse AI is an AI-ready digital laboratory experience connecting universities, students, and industry partners through an immersive, data-driven lab ecosystem.
+LabVerse AI is an interactive, AI-powered digital twin platform designed to showcase university laboratories to students, faculty, and industry partners. It serves as a centralized hub for exploring lab equipment, reviewing student projects, booking physical visits, and querying an intelligent AI guide for contextual insights.
 
-## Correct Active Project Folder
-The correct, active project folder containing the full stack is:
-`/Users/aniket/Downloads/Labverse Ai`
+## Problem Statement
+University lab ecosystems often suffer from fragmented visibility. Students struggle to find relevant projects or equipment, industry partners lack an easy way to explore collaboration opportunities, and faculty admins spend excess time manually managing visit requests and answering repetitive questions.
 
-*(Note: `/Users/aniket/LabVerse Ai` is empty, and duplicate folders should be ignored).*
+## Solution Overview
+LabVerse AI bridges this gap by providing a seamless, public-facing digital directory paired with a robust backend. Users can explore labs via an interactive map, browse an integrated project repository, and book visits. An integrated AI Guide (RAG architecture) allows users to ask questions and receive context-aware answers directly from the lab's knowledge base.
 
-## Prerequisites
-- Node.js (v20+ recommended)
-- Docker Desktop
+## Key Features
+- **Public Lab Explorer:** Browse labs, capabilities, and active equipment statuses.
+- **Interactive Map & Guided Tours:** Visual exploration of the lab ecosystem.
+- **Project Repository:** Discover student projects linked to specific labs and equipment.
+- **AI Guide (LLM + Fallback):** RAG-powered chatbot to answer contextual questions about the ecosystem. Safe fallback mechanism ensures 100% uptime without an API key.
+- **Booking System:** Public visit requests for physical visits, online demos, and industry partnerships.
+- **Faculty Admin Dashboard:** Secure RBAC dashboard to manage, approve, or reject booking requests.
+- **Analytics Tracking:** Real-time event tracking and dashboard insights for lab engagement.
 
-## Local Setup & Troubleshooting
+## Tech Stack
+**Frontend:**
+- Next.js (App Router, React 18)
+- Tailwind CSS
+- Lucide Icons
+- Fetch API with Next.js Cache Control
 
-### 1. Database Start (PostgreSQL & Docker Desktop)
-Before running the database, **Docker Desktop must be installed and running** on your Mac.
-1. Download and install [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/).
-2. Open the "Docker" app from your Applications folder (wait for the whale icon in your top menu bar to show a green background or say "Engine running").
-3. Verify Docker is running by opening a new terminal and typing:
-   ```bash
-   docker ps
-   ```
-   *(It should output a table headers like `CONTAINER ID`, `IMAGE`, etc. If it says `command not found`, Docker is not installed or not in your PATH. If it says `cannot connect to the Docker daemon`, Docker Desktop is not running).*
+**Backend:**
+- Node.js & Express.js
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Zod (Validation)
+- JWT & bcryptjs (Authentication)
 
-Once Docker is verified, start the PostgreSQL container:
+## Architecture Overview
+The application follows a decoupled client-server architecture:
+- **Client Layer:** Next.js Server Components and Client Components render the UI and consume the Express REST APIs. 
+- **Service Layer (Express):** API routes delegate to controllers, which use dedicated services to abstract business logic.
+- **Data Layer:** Prisma interacts with PostgreSQL, managing schemas and executing migrations safely.
 
-```bash
-cd "/Users/aniket/Downloads/Labverse Ai/infrastructure"
-docker compose up -d
+## Folder Structure
+```text
+LabVerse-Ai/
+├── frontend/             # Next.js Application
+│   ├── src/app/          # App Router Pages
+│   ├── src/components/   # Reusable UI Components
+│   └── src/lib/          # API Client & Utilities
+├── backend/              # Express API Server
+│   ├── src/controllers/  # Request Handlers
+│   ├── src/routes/       # Express Router
+│   ├── src/services/     # Business Logic & Database Queries
+│   └── prisma/           # Schema & Seeding Scripts
+├── docs/                 # Documentation & Architecture
+└── README.md             # Project Root Overview
 ```
 
-### 2. Database Migration & Seeding
-Once the database is running (and you verified `docker ps` shows the `postgres` container), initialize the schema and populate the demo data:
+## Local Setup
 
+### 1. Database Configuration
+Ensure you have a running PostgreSQL instance (or Docker container).
+Rename `backend/.env.example` to `backend/.env` and update the `DATABASE_URL`:
 ```bash
-cd "/Users/aniket/Downloads/Labverse Ai/backend"
+DATABASE_URL="postgresql://user:password@localhost:5432/labverse"
+GEMINI_API_KEY="" # Optional for AI Guide
+JWT_SECRET="fallback-secret-for-dev"
+```
+
+### 2. Backend Initialization
+```bash
+cd backend
 npm install
-npm run prisma:generate
-npm run prisma:migrate
+npx prisma generate
+npx prisma migrate dev --name init
 npm run prisma:seed
-```
-
-**View your Data:**
-To view the generated and seeded data in a browser UI, run:
-```bash
-npm run prisma:studio
-```
-
-### 3. Start the Backend API
-The backend requires the database to be running to serve data successfully.
-
-```bash
-cd "/Users/aniket/Downloads/Labverse Ai/backend"
 npm run dev
 ```
-*The backend will run on port 5000.*
 
-### 4. Start the Frontend
-The frontend consumes the API on port 5000. It handles unavailability via a custom ErrorState component.
-
+### 3. Frontend Initialization
 ```bash
-cd "/Users/aniket/Downloads/Labverse Ai/frontend"
+cd frontend
 npm install
 npm run dev
 ```
-*The frontend will run on port 3000.*
 
-## Troubleshooting Notes
-- **Prisma Error P1001 (Can't reach database server at `localhost`:`5432`):** This explicitly means your backend cannot find a running PostgreSQL database. You must open Docker Desktop on your Mac, wait for it to start, and run `docker compose up -d` in the `/infrastructure` directory.
-- **Docker command not found:** Ensure Docker Desktop is properly installed from docker.com, moved to your Applications folder, and currently open.
-- **API Fetch Error (Failed to connect to backend):** This occurs when the Express backend is not running or the frontend cannot reach port 5000. Start the backend (`npm run dev` in `/backend`).
+The application will be accessible at `http://localhost:3000`.
+
+## Demo Credentials
+Use these pre-seeded accounts at `http://localhost:3000/login` to access the protected dashboards:
+- **Faculty Admin:** `admin@labverse.ai` / `Admin@12345`
+- **Student:** `student@labverse.ai` / `Student@12345`
+- **Industry Partner:** `partner@labverse.ai` / `Partner@12345`
+
+## API Summary
+| Route | Method | Access | Description |
+|---|---|---|---|
+| `/api/v1/labs` | GET | Public | Fetch all labs |
+| `/api/v1/projects` | GET | Public | Fetch all projects |
+| `/api/v1/bookings` | POST | Public | Submit visit request |
+| `/api/v1/ai-guide/chat` | POST | Public | Chat with AI (RAG / Fallback) |
+| `/api/v1/auth/login` | POST | Public | JWT Authentication |
+| `/api/v1/admin/bookings` | GET | Admin | Fetch filtered bookings |
+| `/api/v1/admin/bookings/:id/status` | PATCH | Admin | Approve/Reject bookings |
+
+## Future Scope
+- Fully functional Admin Lab & Equipment CRUD management.
+- Real-time WebSocket notifications for booking updates.
+- External Auth Providers (Google / GitHub).
+- Vector DB (Pinecone/pgvector) integration for advanced semantic RAG search.

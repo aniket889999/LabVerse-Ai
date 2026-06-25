@@ -3,6 +3,7 @@ import { api } from '@/lib/api';
 import ErrorState from '@/components/ErrorState';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { ArrowLeft, User, Factory, FileCode2, ExternalLink, Sparkles } from 'lucide-react';
+import { getProjectVisuals } from '@/lib/visuals';
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,12 +17,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     );
   }
 
+  const visuals = getProjectVisuals(project.title);
+  const Icon = visuals.Icon;
+
   return (
     <div className="pb-24">
       <AnalyticsTracker eventType="PROJECT_VIEW" projectId={project.id} />
       {/* Header */}
-      <div className="bg-gray-900 text-white pt-24 pb-16">
-        <div className="container mx-auto px-4">
+      <div className={`relative ${visuals.gradient} text-white pt-24 pb-16 overflow-hidden`}>
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay pointer-events-none"></div>
+        <Icon className="absolute -right-20 -bottom-20 w-96 h-96 text-white opacity-10 pointer-events-none" />
+        <div className="container mx-auto px-4 relative z-10">
           <Link href="/projects" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition">
             <ArrowLeft className="w-4 h-4" /> Back to Repository
           </Link>

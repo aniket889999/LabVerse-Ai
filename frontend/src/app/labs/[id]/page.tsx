@@ -4,6 +4,7 @@ import ErrorState from '@/components/ErrorState';
 import { MapPin, Users, Settings, FolderKanban, Map as MapIcon, ArrowLeft, Sparkles } from 'lucide-react';
 import LabExperience from '@/components/labs/LabExperience';
 import { labMapConfigs } from '@/config/lab-map.config';
+import { getLabVisuals } from '@/lib/visuals';
 
 export default async function LabDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -17,11 +18,16 @@ export default async function LabDetailPage({ params }: { params: Promise<{ id: 
     );
   }
 
+  const visuals = getLabVisuals(lab.name);
+  const Icon = visuals.Icon;
+
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="bg-indigo-900 text-white pt-24 pb-16">
-        <div className="container mx-auto px-4">
+      <div className={`relative ${visuals.gradient} text-white pt-24 pb-16 overflow-hidden`}>
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay pointer-events-none"></div>
+        <Icon className="absolute -right-20 -bottom-20 w-96 h-96 text-white opacity-5 pointer-events-none" />
+        <div className="container mx-auto px-4 relative z-10">
           <Link href="/labs" className="inline-flex items-center gap-2 text-indigo-200 hover:text-white mb-8 transition">
             <ArrowLeft className="w-4 h-4" /> Back to Labs
           </Link>

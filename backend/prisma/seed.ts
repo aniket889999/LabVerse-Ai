@@ -36,6 +36,7 @@ async function main() {
   await prisma.projectMedia.deleteMany();
   await prisma.project.deleteMany();
   await prisma.equipment.deleteMany();
+  await prisma.aiKnowledgeDocument.deleteMany();
   await prisma.lab.deleteMany();
   // We keep users or just delete the admin to recreate cleanly
   await prisma.user.deleteMany({ where: { email: 'admin@labverse.ai' } });

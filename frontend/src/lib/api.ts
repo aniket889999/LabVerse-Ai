@@ -76,4 +76,13 @@ export const api = {
   }),
   logout: () => fetcher<any>('/auth/logout', { method: 'POST' }),
   getCurrentUser: () => fetcher<any>('/auth/me'),
+
+  // Admin Methods
+  getAdminBookings: (params: string = '') => fetcher<any>(`/admin/bookings${params ? `?${params}` : ''}`),
+  updateBookingStatus: (id: string, status: string) => fetcher<any>(`/admin/bookings/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  }),
+  getAdminAnalyticsSummary: () => fetcher<any>('/admin/analytics/summary'),
 };

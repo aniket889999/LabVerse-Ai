@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import ErrorState from '@/components/ErrorState';
-import { Factory, MapPin, Users } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
+import { getLabVisuals } from '@/lib/visuals';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 
 export default async function LabsPage() {
@@ -27,10 +28,14 @@ export default async function LabsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {labs?.map((lab) => (
+        {labs?.map((lab) => {
+          const visuals = getLabVisuals(lab.name);
+          const Icon = visuals.Icon;
+          return (
           <Link href={`/labs/${lab.id}`} key={lab.id} className="group flex flex-col sm:flex-row bg-white rounded-3xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-indigo-200 transition-all duration-300">
-            <div className="sm:w-2/5 bg-gray-100 relative min-h-[200px] flex items-center justify-center p-8 border-b sm:border-b-0 sm:border-r border-gray-100">
-              <Factory className="w-16 h-16 text-indigo-200 group-hover:scale-110 group-hover:text-indigo-300 transition-all duration-500" />
+            <div className={`sm:w-2/5 relative min-h-[200px] flex items-center justify-center p-8 border-b sm:border-b-0 sm:border-r border-gray-100 ${visuals.gradient} overflow-hidden`}>
+              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay"></div>
+              <Icon className={`w-20 h-20 ${visuals.accent} group-hover:scale-110 group-hover:opacity-100 opacity-80 transition-all duration-500 relative z-10 drop-shadow-lg`} />
             </div>
             <div className="sm:w-3/5 p-8 flex flex-col">
               <div className="text-xs font-bold text-indigo-600 tracking-wider uppercase mb-2">{lab.labType.replace(/_/g, ' ')}</div>
@@ -43,7 +48,8 @@ export default async function LabsPage() {
               </div>
             </div>
           </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

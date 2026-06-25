@@ -15,6 +15,7 @@ import bookingsRoutes from './routes/bookings.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import guidedToursRoutes from './routes/guided-tours.routes.js';
 import aiGuideRoutes from './routes/ai-guide.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -46,6 +47,7 @@ apiRouter.use('/bookings', bookingsRoutes);
 apiRouter.use('/analytics', analyticsRoutes);
 apiRouter.use('/guided-tours', guidedToursRoutes);
 apiRouter.use('/ai-guide', aiGuideRoutes);
+apiRouter.use('/admin', adminRoutes);
 
 app.use('/api/v1', apiRouter);
 

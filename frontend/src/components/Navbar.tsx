@@ -25,11 +25,16 @@ export default function Navbar() {
       }
     };
     fetchUser();
+
+    const handleAuthChange = () => fetchUser();
+    window.addEventListener('auth-change', handleAuthChange);
+    return () => window.removeEventListener('auth-change', handleAuthChange);
   }, []);
 
   const handleLogout = async () => {
     await api.logout();
     setUser(null);
+    window.dispatchEvent(new Event('auth-change'));
     router.push('/login');
     router.refresh();
   };
